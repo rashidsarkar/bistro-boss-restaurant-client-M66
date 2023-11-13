@@ -9,12 +9,16 @@ import {
   validateCaptcha,
 } from "react-simple-captcha";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
 function Login() {
   const captchaRef = useRef(null);
   const [disabled, setDisabled] = useState(true);
   const { singin } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
@@ -25,13 +29,20 @@ function Login() {
     const email = form.email.value;
     const password = form.password.value;
     console.log(email, password);
-    singin(email, password).than((result) => {
+    singin(email, password).then((result) => {
       const user = result.user;
+      Swal.fire({
+        title: "Good job!",
+        text: "You clicked the button!",
+        icon: "success",
+      });
       console.log(user);
+      navigate(form, { replace: true });
     });
   };
-  const handleValidateCaptcha = () => {
-    const user_captcha_value = captchaRef.current.value;
+  const handleValidateCaptcha = (e) => {
+    const user_captcha_value = e.target.value;
+    console.log(user_captcha_value);
     if (validateCaptcha(user_captcha_value)) {
       setDisabled(false);
     } else {
@@ -96,14 +107,8 @@ function Login() {
                   ref={captchaRef}
                   placeholder="type captcha"
                   className="input input-bordered"
-                  required
+                  onBlur={handleValidateCaptcha}
                 />
-                <button
-                  onClick={handleValidateCaptcha}
-                  className="mt-2 btn btn-outline btn-xs"
-                >
-                  Validate
-                </button>
               </div>
               <div className="mt-6 form-control">
                 <button
