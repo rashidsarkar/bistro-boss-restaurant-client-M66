@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useContext } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import {
@@ -7,9 +8,12 @@ import {
   LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from "react-simple-captcha";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
+import { Link } from "react-router-dom";
 function Login() {
   const captchaRef = useRef(null);
   const [disabled, setDisabled] = useState(true);
+  const { singin } = useContext(AuthContext);
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
@@ -20,6 +24,10 @@ function Login() {
     const email = form.email.value;
     const password = form.password.value;
     console.log(email, password);
+    singin(email, password).than((result) => {
+      const user = result.user;
+      console.log(user);
+    });
   };
   const handleValidateCaptcha = () => {
     const user_captcha_value = captchaRef.current.value;
@@ -102,6 +110,11 @@ function Login() {
               </button>
             </div>
           </form>
+          <p>
+            <small>
+              New Hare?<Link to={"/singup"}>Create A New Account</Link>
+            </small>
+          </p>
         </div>
       </div>
     </div>
